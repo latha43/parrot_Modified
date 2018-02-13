@@ -1,0 +1,31 @@
+- hosts: localhost
+  connection: local
+
+  roles:
+    - jira_roles
+  tasks:
+    - jira_project:
+        
+        projectName: "{{projectName}}"
+        assigneeType: "{{assigneeType}}"
+        projectTypeKey: "{{projectTypeKey}}"
+        lead: "{{lead}}"
+        
+       
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

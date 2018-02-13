@@ -1,0 +1,15 @@
+- hosts: localhost
+  connection: local
+
+  roles:
+    - bb_roles
+
+  tasks:
+    - debug:
+        msg: "Input are {{ project }}, {{ repo|default(None) }}, {{ user }}, {{ permission }}"
+
+    - bitbucket_permission:
+        project: "{{ project }}"
+        repo: "{{ repo|default(None) }}"
+        user: "{{ user }}"
+        permission: "{{ permission }}"

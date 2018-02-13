@@ -1,0 +1,14 @@
+- hosts: localhost
+  connection: local
+  roles:
+    - jira_roles
+  tasks:
+  - debug:
+        msg: "{{ name }}, {{ display_name }}, {{ email_address }}"
+
+  - jira_user:
+        name: "{{ name }}"
+        display_name: "{{ display_name }}"
+        email_address: "{{ email_address }}"
+
+

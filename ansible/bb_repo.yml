@@ -1,0 +1,10 @@
+- hosts: localhost
+  connection: local
+
+  roles:
+    - bb_roles
+
+  tasks:
+    - bitbucket_repo:
+        project: "{{ project}}"
+        repo: "{{ repo}}"

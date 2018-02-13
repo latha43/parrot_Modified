@@ -1,0 +1,13 @@
+- hosts: localhost
+  connection: local
+
+  roles:
+    - bb_roles
+
+  tasks:
+    - debug:
+        msg: "{{ user }}, {{ display_name }}, {{ email }}"
+    - bitbucket_user:
+        name: "{{ user }}"
+        display_name: "{{ display_name }}"
+        email_address: "{{ email }}"

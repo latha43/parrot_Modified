@@ -1,0 +1,89 @@
+Parrot is a user-extendable Slack bot for process automation.Parrot provides a chat-ops means
+for executing tasks in Jira and Bitbucket. It creates a simple way to perform privileged Jira
+and Bitbucket organization management tasks without much mannual effort.
+
+
+##How it works?
+-------------
+
+You simply type !help, and the bot will output a list of commands that the bot supports.
+Typing the command,for example: !git addproject -p <project> -d <description>, will
+execute the command.ie,It will create a new project in Bitbucket and the response will
+be notified.
+
+At a minimum, you will need to have the following:
+
+Python 2.7
+Slack and Slack credentials
+Virtual box with python2.7
+rtmbot and slack client
+Kafka
+reddis
+rq
+
+##Features:
+-------------
+
+*Based on slack Real Time Messaging API
+*Simple plugins mechanism
+*Messages can be handled concurrently
+*Python 2.7 Support
+*User creation and project creation in Jira
+*User creation, project creation, repository creation, grant permission in Bitbucket
+
+##Installation:
+-------------
+
+  Created a virtual environment and installed the following:
+1.For programming slack:
+    1). Rtmbot:
+    ```pip install rtmbot```
+    2)slack client:
+    ```pip install slack client```
+
+2.For setting up Kafka server:
+     Download the file from the link https://www.apache.org/dyn/closer.cgi?path=/kafka/1.0.0/kafka_2.11-1.0.0.tgz
+
+3.For automation using ansible:
+    1). reddis:
+    ```wget  http://download.redis.io/releases/redis-4.0.6.tar.gz```
+    2). rq :
+    ```pip install rq```
+    3). ansible version:2.3.0 :
+    ```pip install ansible=2.3.0```
+
+
+##Automating the tasks:
+-------------
+
+The configuration file rtmbot.conf contains all the plugins and the token that generated while
+creating the chat bot. Then we created another folder called plugins which consist all the
+plugins that we are going to use for this task. For the jira commands Jira plugin was created.
+The purpose of plugins is to automate the execution of all the commands related to Jira and
+Bitbucket. For that first we need to identify the commands from the data that are coming through
+the channel. This is made possible with the help of regular expression module available in python. For filtering we set a standard that each command should start with a ‘!’
+which will make the process easier.Using argument parser, the arguments present in the commands
+are identified and validated. For each command, we wrote separate function so that it can be
+passed to the consumer side via Kafka.
+
+Kafka:
+
+Kafka is used for building real-time data pipelines and streaming apps or simply a messaging
+system.A Messaging System is responsible for transferring data from one application to another,
+so the applications can focus on data, but not worry about how to share it.In our application
+Kafka is used as a message queue where our plugin acta as a producer. From producer, we
+transmit needed data into consumer side where the data is used by ansible for automation.
+Other than bit bucket plugin we have one more plugin.This plugin is used to respond when an
+incorrect command is entered by user.
+
+
+Automation using ansible:
+A mapper function is used to map the data coming from the Kafka producer to the ansible playbook.
+Playbook is executed from runscript.py file. Playbook contains the role and it will pass the needed
+parameters to python files . Python file execute the task with help of jira api.API is the primary
+way to interact with Jira remotely, whether you are building an app, scripting interactions with
+Jira or developing any other integration.(eg: For creating a user api used is rest/api/2/user)
+Call back plugin is used in this application. Callback plugins enable adding new behaviors to
+Ansible when responding to events. By default, callback plugins control most of the output you
+see when running the command line programs, but can also be used to add additional output,
+integrate with other tools and marshall the events to a storage backend
