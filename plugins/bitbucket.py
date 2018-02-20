@@ -35,6 +35,7 @@ class BitbucketPlugin(DevopsPlugin):
                          'email': namespace.email,
                          'display_name': namespace.desc,
                          'channel': data['channel']}
+            
             self.ingest(b'git-adduser', arguments)
             return True
         else:
