@@ -22,9 +22,7 @@ method_mapper = METHOD_MAPPER
 playbook_mapper = PLAYBOOK_MAPPER
 
 
-
 def message_producer(key,value):
-
     method_playbook = key.split('-')
     method = method_mapper[method_playbook[0]]
     playbook = playbook_mapper[method_playbook[1]]
