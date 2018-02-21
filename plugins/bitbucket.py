@@ -35,7 +35,7 @@ class BitbucketPlugin(DevopsPlugin):
                          'email': namespace.email,
                          'display_name': namespace.desc,
                          'channel': data['channel']}
-            
+            print ("Hai")
             self.ingest(b'git-adduser', arguments)
             return True
         else:
@@ -108,6 +108,7 @@ class BitbucketPlugin(DevopsPlugin):
             return False
 
     def process_message(self, data):
+        print ("process message")
         if data['user'] in self.users_white_list:
             return
 
