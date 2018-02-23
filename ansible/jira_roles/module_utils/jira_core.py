@@ -16,9 +16,9 @@ class JiraApi(object):
 
     """
     headers = {'Content-Type': 'application/json'}
-    username = 'Lathangi.Nagaraj'
-    password = 'latha@43'
-    base_url = 'http://10.10.114.174:8080/rest'
+    username = 'devika'
+    password = 'jira_admin'
+    base_url = 'http://10.10.114.174:8088/rest'
     user = 'api/2/user'
     project='api/2/project'
 

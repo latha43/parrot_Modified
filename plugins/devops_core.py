@@ -1,8 +1,5 @@
-import json
-
-from kafka import KafkaProducer
 from rtmbot.core import Plugin
-
+import mapper_tasks
 import datetime
 
 
@@ -33,14 +30,11 @@ class Token(object):
 
 
 class DevopsPlugin(Plugin):
-    topic = 'chat-bot-topic-devops'
     users_white_list = ['U8LTWHG67']
     token_class = Token
-
     def ingest(self, key, value):
         value['ts'] = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%s')
-        producer = KafkaProducer(bootstrap_servers='10.10.114.174:9092',
-                                 value_serializer=lambda v: json.dumps(v).encode('utf-8'))
-        producer.send(self.topic, key=key, value=value)
-        producer.flush()
-        producer.close()
+        mapper_tasks.message_producer(self,key,value)
+
+
+
