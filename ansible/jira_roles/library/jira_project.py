@@ -65,7 +65,6 @@ EXAMPLES = '''
 def run_module():
     module_args = dict(
         projectName=dict(type='str', required=True),
-        #key=dict(type='str', required=True),
         assigneeType=dict(type='str', required=True),
         projectTypeKey=dict(type='str', required=True),
         lead=dict(type='str', required=True)
@@ -85,22 +84,20 @@ def run_module():
     if module.check_mode:
         return result
 
-    projectName = module.params.get('projectName')
-    #key = module.params.get('key')
-    assigneeType = module.params.get('assigneeType')
-    projectTypeKey = module.params.get('projectTypeKey')
+    projectname = module.params.get('projectName')
+    assigneetype = module.params.get('assigneeType')
+    projesscttypekey = module.params.get('projectTypeKey')
     lead = module.params.get('lead')
 
-
     try:
-     if projectName :
+        if projectname:
 
-        res, msg = Jira.create_project(projectName,assigneeType, projectTypeKey, lead)
-        if res == JiraApi.EXISTS:
-            result['changed'] = False
-        elif res:
-            result['changed'] = True
-        result['message'] = msg
+            res, msg = Jira.create_project(projectname, assigneetype, projecttypekey, lead)
+            if res == JiraApi.EXISTS:
+                result['changed'] = False
+            elif res:
+                result['changed'] = True
+            result['message'] = msg
 
     except Exception as e:
 

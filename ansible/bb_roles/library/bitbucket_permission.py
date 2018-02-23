@@ -112,10 +112,8 @@ def run_module():
 
     module.exit_json(**result)
 
-
 def main():
     run_module()
-
 
 if __name__ == '__main__':
     main()
