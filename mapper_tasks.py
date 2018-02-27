@@ -12,8 +12,8 @@ for item in dict.iteritems():
     if "MAPPER_FILE" in item:
         mapper_file = item[1]
     if "METHOD_MAPPER" in item:
-        method_mapper_value = item[1][0]
         item[1][0] = {key: mapper_file for key in item[1][0]}
+        method_mapper_value = item[1][0]
     if "PLAYBOOK_MAPPER" in item:
         playbook_mapper_value = item[1][0]
 
