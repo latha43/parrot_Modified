@@ -1,32 +1,32 @@
-
 from redis import Redis
 from rq import Queue
 import run_script
+from utils import serializer
+
+dict = serializer.serialize()
+for item in dict.iteritems():
+    if "RQ_HOST" in item:
+        rq_host = item[1]
+    if "RQ_PORT" in item:
+        rq_port = item[1]
+    if "MAPPER_FILE" in item:
+        mapper_file = item[1]
+    if "METHOD_MAPPER" in item:
+        item[1][0] = {key: mapper_file for key in item[1][0]}
+        method_mapper_value = item[1][0]
+    if "PLAYBOOK_MAPPER" in item:
+        playbook_mapper_value = item[1][0]
+
+q = Queue(connection=Redis(host=rq_host, port=rq_port))
+
+method_mapper = method_mapper_value
+
+playbook_mapper = playbook_mapper_value
 
 
-
-q = Queue(connection=Redis(host='10.10.114.174', port=6379))
-
-method_mapper = {
-    'git': 'run_script',
-    'jira': 'run_script'
-    }
-
-playbook_mapper = {
-    'adduser': 'ansible/bb_user.yml',
-    'addproject': 'ansible/bb_project.yml',
-    'addrepo': 'ansible/bb_repo.yml',
-    'addpermission': 'ansible/bb_permission.yml',
-    'newuser': 'ansible/jira_user.yml',
-    'newproject': 'ansible/jira_project.yml'
-    }
-
-
-def ingest_new(key,value):
-
+def message_producer(key,value):
     method_playbook = key.split('-')
     method = method_mapper[method_playbook[0]]
     playbook = playbook_mapper[method_playbook[1]]
     args = value
-
     q.enqueue(run_script.__dict__[method], playbook, args['channel'], extra_arguments=args)

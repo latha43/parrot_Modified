@@ -11,7 +11,6 @@ class Token(object):
     def __init__(self, word):
         self.me = word.strip()
 
-    @property
     def __str__(self):
         return str(self.me)
 
@@ -31,13 +30,11 @@ class Token(object):
 
 class DevopsPlugin(Plugin):
 
-    topic = 'chat-bot-topic-devops'
     users_white_list = ['U8LTWHG67']
     token_class = Token
 
     def ingest(self, key, value):
        
         value['ts'] = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%s')
-
-        mapper_tasks.ingest_new(key,value)
+        mapper_tasks.message_producer(key,value)
 
