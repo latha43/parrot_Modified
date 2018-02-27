@@ -2,17 +2,13 @@
 import sys
 from redis import Redis
 from rq import Connection, Worker
-import yaml
+from utils import serialize
 
-with open("rtmbot.conf","r") as file:
-    dic=yaml.load(file)
-    for key,value in dic.iteritems():
-        if key=="HOST":
-            HOST=value
-        if key=="PORT":
-            PORT=value
-redis = Redis(host=HOST, port=PORT)
+serialized_data = serialize.serialize()
+rq_host = serialized_data[0]
+rq_port = serialized_data[1]
 
+redis = Redis(host=rq_host, port=rq_port)
 with Connection(connection=redis):
     print ("workrer")
     qs = sys.argv[1:] or ['default']
