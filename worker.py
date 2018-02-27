@@ -2,7 +2,7 @@
 import sys
 from redis import Redis
 from rq import Connection, Worker
-from module_utils import serialize_core
+from utils import serialize_core
 
 dict = serialize_core.serialize()
 for item in dict.iteritems():
