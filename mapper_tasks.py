@@ -1,9 +1,9 @@
 from redis import Redis
 from rq import Queue
 import run_script
-from utils import serialize_core
+from utils import serializer
 
-dict = serialize_core.serialize()
+dict = serializer.serialize()
 for item in dict.iteritems():
     if "RQ_HOST" in item:
         rq_host = item[1]

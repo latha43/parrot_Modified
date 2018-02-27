@@ -2,9 +2,9 @@
 import sys
 from redis import Redis
 from rq import Connection, Worker
-from utils import serialize_core
+from utils import serializer
 
-dict = serialize_core.serialize()
+dict = serializer.serialize()
 for item in dict.iteritems():
     if "RQ_HOST" in item:
         rq_host = item[1]
