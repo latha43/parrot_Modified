@@ -1,7 +1,7 @@
 from redis import Redis
 from rq import Queue
 import run_script
-from serialize_module_utils import serialize_core
+from module_utils import serialize_core
 
 dict = serialize_core.serialize()
 for item in dict.iteritems():
