@@ -2,19 +2,18 @@
 import sys
 from redis import Redis
 from rq import Connection, Worker
-import yaml
+from serialize_module_utils import serialize_core
 
-with open("rtmbot.conf") as stream:
-    dict = yaml.load(stream)
-    for key, value in dict.iteritems():
-        if "RQ_HOST" in key:
-            RQ_HOST = value
-        if "RQ_PORT" in key:
-            RQ_PORT = value
-redis = Redis(host=RQ_HOST, port=RQ_PORT)
+dict = serialize_core.serialize()
+for item in dict.iteritems():
+    if "RQ_HOST" in item:
+        rq_host = item[1]
+    if "RQ_PORT" in item:
+        rq_port = item[1]
+
+redis = Redis(host=rq_host, port=rq_port)
 
 with Connection(connection=redis):
     qs = sys.argv[1:] or ['default']
-
     w = Worker(qs)
     w.work()

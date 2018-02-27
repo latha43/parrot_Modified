@@ -1,25 +1,27 @@
 from redis import Redis
 from rq import Queue
 import run_script
-import yaml
+from serialize_module_utils import serialize_core
 
-with open("rtmbot.conf") as stream:
-        dict=yaml.load(stream)
-        for key, value in dict.iteritems():
-            if "RQ_HOST" in key:
-                RQ_HOST=value
-            if "RQ_PORT" in key:
-                RQ_PORT=value
-            if "METHOD_MAPPER" in key:
-                METHOD_MAPPER=value[0]
-            if "PLAYBOOK_MAPPER" in key:
-                PLAYBOOK_MAPPER=value[0]
+dict = serialize_core.serialize()
+for item in dict.iteritems():
+    if "RQ_HOST" in item:
+        rq_host = item[1]
+    if "RQ_PORT" in item:
+        rq_port = item[1]
+    if "MAPPER_FILE" in item:
+        mapper_file = item[1]
+    if "METHOD_MAPPER" in item:
+        method_mapper_value = item[1][0]
+        item[1][0] = {key: mapper_file for key in item[1][0]}
+    if "PLAYBOOK_MAPPER" in item:
+        playbook_mapper_value = item[1][0]
 
-q = Queue(connection=Redis(host=RQ_HOST, port=RQ_PORT))
+q = Queue(connection=Redis(host=rq_host, port=rq_port))
 
-method_mapper = METHOD_MAPPER
+method_mapper = method_mapper_value
 
-playbook_mapper = PLAYBOOK_MAPPER
+playbook_mapper = playbook_mapper_value
 
 
 def message_producer(key,value):
