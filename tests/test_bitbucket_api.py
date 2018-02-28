@@ -6,7 +6,7 @@ import pytest
 here = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, here + '/../ansible/bb_roles')
 
-from module_utils.bitbucket_core import BitBucket
+from utils.bitbucket_core import BitBucket
 
 @pytest.fixture
 def bb_interface():
