@@ -1,7 +1,7 @@
 import os
 import sys
 from collections import namedtuple
-
+import re
 from ansible.parsing.dataloader import DataLoader
 from ansible.vars import VariableManager
 from ansible.inventory import Inventory
@@ -17,7 +17,7 @@ def send_message(slack_channel, msg):
         username="devbotuser")
 
 
-def run_script(playbook_path, channel, inventory_sources=None, extra_arguments={}):
+def run_script(playbook_path,channel,inventory_sources=None,extra_arguments={}):
     Options = namedtuple('Options',
                 ['listtags', 'listtasks', 'listhosts', 'syntax', 'connection', 'module_path', 'forks',
                  'remote_user', 'private_key_file', 'ssh_common_args', 'ssh_extra_args', 'sftp_extra_args',
@@ -51,6 +51,8 @@ def run_script(playbook_path, channel, inventory_sources=None, extra_arguments={
             run_success = False
             send_message(channel, '```{}```'.format(str(t)))
 
+
+    pbex._tqm.send_callback('notify_jira',channel)
     pbex._tqm.send_callback('notify_slack', channel)
 
     if run_success:

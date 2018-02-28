@@ -86,14 +86,16 @@ def run_module():
 
     projectname = module.params.get('projectName')
     assigneetype = module.params.get('assigneeType')
-    projesscttypekey = module.params.get('projectTypeKey')
+    projectypekey = module.params.get('projectTypeKey')
     lead = module.params.get('lead')
 
     try:
         if projectname:
 
-            res, msg = Jira.create_project(projectname, assigneetype, projecttypekey, lead)
+            res, msg = Jira.create_project(projectname, assigneetype, projectypekey, lead)
             if res == JiraApi.EXISTS:
+                result['changed'] = False
+            elif res==JiraApi.FAILED:
                 result['changed'] = False
             elif res:
                 result['changed'] = True
