@@ -3,6 +3,7 @@ import random
 import re
 import requests
 import string
+from jira import JIRA
 
 
 class JiraApi(object):
@@ -21,9 +22,6 @@ class JiraApi(object):
     base_url = os.environ.get('JIRA_URL')
     user = 'api/2/user'
     project='api/2/project'
-    issue='api/2/issue'
-    issue_update='api/2/issue/{issuekey}/transitions'
-    status='api/2/status'
 
     EXISTS = 9
     SUCCESS = True
@@ -34,6 +32,8 @@ class Jira(object):
     """
     Python wrapper for JIRA REST APIs
     """
+
+
     def __init__(self, **kwargs):
         for key, value in kwargs.items():
             print (key)
@@ -66,6 +66,7 @@ class Jira(object):
 
     @classmethod
     def add_user(cls, name, password, display_name, email_address):
+
         valid_mail_id = cls._valid_email(email_address)
         if not valid_mail_id:
             msg = 'Email id [{}] is not a valid one'.format(email_address)
@@ -96,6 +97,7 @@ class Jira(object):
 
     @classmethod
     def get_users(cls, user_info=None):
+
         kwargs = dict()
         kwargs['url'] =  os.path.join(JiraApi.base_url, JiraApi.user)
 
@@ -120,8 +122,6 @@ class Jira(object):
 
     @classmethod
     def create_project(cls, projectname, assigneetype, projecttypekey, lead):
-        print("hai")
-        tc=cls.ticket_generation('TASK_manager','description','create_project','task')
 
         project=cls.get_all_projects(projectname)
         user=cls.get_users(lead)
@@ -147,14 +147,18 @@ class Jira(object):
             res = instance(method='post')
 
             res.raise_for_status()
+
             msg = 'Project with key [{}] has been successfully created'.format(key)
+
+
             return JiraApi.SUCCESS, msg
         else:
             msg= 'Lead does not exist so add the user and try again'
-            return JiraApi.SUCCESS, msg
+            return JiraApi.FAILED, msg
 
     @classmethod
     def key_gen(cls,projectname):
+
         if len(projectname)<3:
             name=projectname
         else:
@@ -208,61 +212,9 @@ class Jira(object):
         else:
             return None
 
-    @classmethod
-    def ticket_generation(cls, projectname,description,issue_name,issuetype):
-
-
-        kwargs = dict()
-        kwargs['url'] = os.path.join(JiraApi.base_url, JiraApi.issue)
-        print
-        print kwargs['url']
-        kwargs['headers'] = JiraApi.headers
-        kwargs['json'] = {
-
-            "fields": {
-                "project":
-                    {
-                        "key": "TAS",
-                        "status": {
-
-                            "name": "To Do"
-                        }
-                    },
-                "summary": issue_name,
-                "description": description,
-                "issuetype": {
-                    "name": "Task"
-                }
-            }
-        }
-
-        instance = cls(**kwargs)
-        res = instance(method='post')
-        print res
-        res.raise_for_status()
-
-        return True
-    @classmethod
-    def ticket_view(cls):
-
-        key ="TAS-5"
-        kwargs = dict()
-        kwargs['url'] = os.path.join(JiraApi.base_url, JiraApi.issue,key)
-        print
-        print kwargs['url']
-        instance = cls(**kwargs)
-        res = instance(method='get')
-        projects = res.json()
-        print projects
-        return  True
-
-
-
-
-
-
 
 if __name__ == '__main__':
 
-    print(Jira.create_project('deea','PROJECT_LEAD','business','devika'))
+    print(Jira.create_project('dzzxea','PROJECT_LEAD','business','devika'))
+    #print(Jira.ticket_update('TAS-1'))
 
