@@ -19,7 +19,8 @@
 # Make coding more python3-ish
 from __future__ import (absolute_import, division)
 __metaclass__ = type
-
+from jira import JIRA
+import re
 import os
 
 from ansible.plugins.callback import CallbackBase
@@ -28,6 +29,8 @@ from slackclient import SlackClient
 
 
 class CallbackModule(CallbackBase):
+
+
     """
     This Ansible callback plugin notify errors to interested parties.
     """
@@ -73,10 +76,42 @@ class CallbackModule(CallbackBase):
                 print slack_client.api_call("chat.postMessage", channel=slack_channel, text=msg,username="devbotuser")
 
             if res._result.has_key('message'):
-                msg='`{0} : {1}`'.format(res.task_name, res._result['message'])
+                msg = '`{0} : {1}`'.format(res.task_name, res._result['message'])
                 print slack_client.api_call(
-                    "chat.postMessage", channel=slack_channel, text=msg,
+                    "chat.postMessage", channel= slack_channel, text=msg,
                     username="devbotuser")
+
+    def notify_jira(self,  slack_channel):
+        slack_client = SlackClient(os.environ.get('SLACK_API_TOKEN'))
+        username = os.environ.get('JIRA_TICKET_USER')
+        password = os.environ.get('JIRA_TICKET_PWD')
+        base_url = os.environ.get('JIRA_TICKET_URL')
+        project_key=os.environ.get('JIRA_PROJECT_KEY')
+        options = {
+            'server': base_url
+        }
+
+        Jira = JIRA(basic_auth=(username, password), options=options)
+        for res in self.loop_items[1:]:
+
+            if res._result.has_key('changed'):
+
+                if res._result['changed'] == True:
+
+                    message = res._result['message']
+                    task = 'devbotuser: {0} requested by {1} completed'.format(res.task_name,slack_channel)
+
+                    issue_dict = {
+                        'project': project_key,
+                        'summary': task,
+                        'description': message,
+                        'issuetype': {'name': 'Task'},
+                    }
+
+                    new_issue = Jira.create_issue(fields=issue_dict)
+                    print new_issue
+                    Jira.transition_issue(new_issue, '21')
+
 
 
 

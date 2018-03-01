@@ -63,6 +63,7 @@ def run_module():
         message='',
         meta=None,
         failed=False
+
     )
 
     module = AnsibleModule(
@@ -82,11 +83,11 @@ def run_module():
         res, msg = Jira.add_user(name, pwd, display_name, email_address)
 
         if res == JiraApi.EXISTS:
-             result['changed'] = False
+            result['changed'] = False
 
         elif res:
-             result['changed'] = True
-             result['pwd'] = pwd
+            result['changed'] = True
+            result['pwd'] = pwd
         result['message'] = msg
 
     except Exception as e:

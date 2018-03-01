@@ -29,4 +29,6 @@ def message_producer(key,value):
     method = method_mapper[method_playbook[0]]
     playbook = playbook_mapper[method_playbook[1]]
     args = value
+
     q.enqueue(run_script.__dict__[method], playbook, args['channel'], extra_arguments=args)
+

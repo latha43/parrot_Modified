@@ -3,6 +3,7 @@ import random
 import re
 import requests
 import string
+from jira import JIRA
 
 
 class JiraApi(object):
@@ -16,9 +17,9 @@ class JiraApi(object):
 
     """
     headers = {'Content-Type': 'application/json'}
-    username = 'Lathangi.Nagaraj'
-    password = 'latha@43'
-    base_url = 'http://10.10.114.174:8080/rest'
+    username = os.environ.get('JIRA_ADMIN_USER')
+    password = os.environ.get('JIRA_ADMIN_PWD')
+    base_url = os.environ.get('JIRA_URL')
     user = 'api/2/user'
     project='api/2/project'
 
@@ -31,6 +32,8 @@ class Jira(object):
     """
     Python wrapper for JIRA REST APIs
     """
+
+
     def __init__(self, **kwargs):
         for key, value in kwargs.items():
             print (key)
@@ -53,7 +56,6 @@ class Jira(object):
 
         res = requests.request(method, obj.url, auth=(JiraApi.username, JiraApi.password),
                                headers=headers, params=params, data=data, json=json)
-
         return res
 
     @classmethod
@@ -64,6 +66,7 @@ class Jira(object):
 
     @classmethod
     def add_user(cls, name, password, display_name, email_address):
+
         valid_mail_id = cls._valid_email(email_address)
         if not valid_mail_id:
             msg = 'Email id [{}] is not a valid one'.format(email_address)
@@ -75,9 +78,8 @@ class Jira(object):
            return JiraApi.EXISTS, msg
         mail_id=cls.get_users(valid_mail_id)
 
-
         kwargs = dict()
-        kwargs['url'] =  os.path.join(JiraApi.base_url,JiraApi.user)
+        kwargs['url'] = os.path.join(JiraApi.base_url, JiraApi.user)
 
         kwargs['headers'] = JiraApi.headers
         kwargs['json'] = {
@@ -93,11 +95,11 @@ class Jira(object):
         msg = 'User [{}] has been successfully created'.format(name)
         return JiraApi.SUCCESS, msg
 
-
     @classmethod
     def get_users(cls, user_info=None):
+
         kwargs = dict()
-        kwargs['url'] =  os.path.join(JiraApi.base_url,JiraApi.user)
+        kwargs['url'] =  os.path.join(JiraApi.base_url, JiraApi.user)
 
         if user_info:
             kwargs['params'] = {'username': user_info}
@@ -118,100 +120,86 @@ class Jira(object):
         else:
             return None
 
-
-
-
-
     @classmethod
-    def create_project(cls,projectName,assigneeType,projectTypeKey,lead):
+    def create_project(cls, projectname, assigneetype, projecttypekey, lead):
 
-
-        project=cls.get_all_projects(projectName)
+        project=cls.get_all_projects(projectname)
         user=cls.get_users(lead)
-        #project_key=cls.get_projects(key.upper())
-        key = cls.key_gen(projectName)
-
+        key = cls.key_gen(projectname)
         if project:
-
             if project:
-                msg = 'Project with this projectName [{}]  already exists'.format(projectName)
+                msg = 'Project with this projectName [{}]  already exists'.format(projectname)
             return JiraApi.EXISTS, msg
 
         if user:
-              kwargs = dict()
 
-              kwargs['url'] = os.path.join(JiraApi.base_url, JiraApi.project)
-
-              kwargs['headers'] = JiraApi.headers
-              kwargs['json'] = {
-                    'name': projectName,
+            kwargs = dict()
+            kwargs['url'] = os.path.join(JiraApi.base_url, JiraApi.project)
+            kwargs['headers'] = JiraApi.headers
+            kwargs['json'] = {
+                    'name': projectname,
                     'key': key,
-                    'assigneeType': assigneeType,
-                    "projectTypeKey": projectTypeKey,
+                    'assigneeType': assigneetype,
+                    "projectTypeKey": projecttypekey,
                     'lead': lead,
                 }
-              instance = cls(**kwargs)
-              res = instance(method='post')
+            instance = cls(**kwargs)
+            res = instance(method='post')
 
-              res.raise_for_status()
-              msg = 'Project with key [{}] has been successfully created'.format(key)
-              return JiraApi.SUCCESS, msg
+            res.raise_for_status()
+
+            msg = 'Project with key [{}] has been successfully created'.format(key)
+
+
+            return JiraApi.SUCCESS, msg
         else:
             msg= 'Lead does not exist so add the user and try again'
-            return JiraApi.SUCCESS, msg
+            return JiraApi.FAILED, msg
 
     @classmethod
-    def key_gen(cls,projectName):
-        if len(projectName)<3:
-            name=projectName
+    def key_gen(cls,projectname):
+
+        if len(projectname)<3:
+            name=projectname
         else:
-            name = projectName[:3].upper()
+            name = projectname[:3].upper()
 
         key1 = name.join((random.choice(string.ascii_letters) for _ in range(3)))
-        key=key1.upper()
+        key = key1.upper()
         project_key=cls.get_projects(key)
 
         if project_key:
-           key1 = key1.join((random.choice(string.ascii_letters) for _ in range(3)))
-           key = key1.upper()
-           return key
+            key1 = key1.join((random.choice(string.ascii_letters) for _ in range(3)))
+            key = key1.upper()
+            return key
         else:
             return key
-
-
-
 
     @classmethod
     def get_projects(cls,key):
 
         kwargs = dict()
         kwargs['url'] = os.path.join(JiraApi.base_url, JiraApi.project,key)
-
         if key:
-
             instance = cls(**kwargs)
             res = instance(method='get')
-
             projects = res.json()
-
             if projects:
-              try:
-               if projects['errorMessages']:
-                    return None
-               else:
-
-                    return projects
-              except:
-                  return projects
+                try:
+                    if projects['errorMessages']:
+                        return None
+                    else:
+                        return projects
+                except:
+                        return projects
             else:
                 return None
-
 
     @classmethod
     def get_all_projects(cls, name):
 
         kwargs = dict()
-        kwargs['url'] = os.path.join(JiraApi.base_url,JiraApi.project)
+        kwargs['url'] = os.path.join(JiraApi.base_url, JiraApi.project)
         print(kwargs['url'])
         instance = cls(**kwargs)
         res = instance(method='get')
@@ -220,18 +208,13 @@ class Jira(object):
         if name:
             for p in projects:
                 if p['name']==name:
-                  return name
-        else :
+                    return name
+        else:
             return None
 
 
 if __name__ == '__main__':
 
-
-     #print(Jira.add_user('mayuri4', 'mayuri4', 'mayuri4 b ', 'mayuri4@ust-global.com'))
-     print(Jira.create_project('deea','PROJECT_LEAD','business','devika'))
-     #print(Jira.create_project())
-     #print(Jira.get_projects())
-     #print (Jira.get_all_projects('FirstJob'))
-
+    print(Jira.create_project('dzzxea','PROJECT_LEAD','business','devika'))
+    #print(Jira.ticket_update('TAS-1'))
 
