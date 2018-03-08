@@ -196,7 +196,11 @@ class BitBucket(object):
 
         user = cls.get_users(valid_mail_id)
         if user:
-            msg = 'User [{}] already exists'.format(name)
+            msg = ' [{}] already exists'.format(valid_mail_id)
+            return BBApi.EXISTS, msg
+        Name = cls.get_users(name)
+        if Name:
+            msg = '[{}] already exists'.format(name)
             return BBApi.EXISTS, msg
 
         kwargs = dict()
@@ -214,6 +218,7 @@ class BitBucket(object):
         instance(method='post')
         msg = 'User [{}] has been successfully created'.format(name)
         return BBApi.SUCCESS, msg
+
 
     @classmethod
     def delete_user(cls, name):

@@ -3,26 +3,11 @@ from rq import Queue
 import run_script
 from utils import serializer
 
-dict = serializer.serialize()
-for item in dict.iteritems():
-    if "RQ_HOST" in item:
-        rq_host = item[1]
-    if "RQ_PORT" in item:
-        rq_port = item[1]
-    if "MAPPER_FILE" in item:
-        mapper_file = item[1]
-    if "METHOD_MAPPER" in item:
-        item[1][0] = {key: mapper_file for key in item[1][0]}
-        method_mapper_value = item[1][0]
-    if "PLAYBOOK_MAPPER" in item:
-        playbook_mapper_value = item[1][0]
+q = Queue(connection=Redis(host = serializer.rq_host, port = serializer.rq_port))
 
-q = Queue(connection=Redis(host=rq_host, port=rq_port))
+method_mapper = serializer.method_mapper_value
 
-method_mapper = method_mapper_value
-
-playbook_mapper = playbook_mapper_value
-
+playbook_mapper = serializer.playbook_mapper_value
 
 def message_producer(key,value):
     method_playbook = key.split('-')

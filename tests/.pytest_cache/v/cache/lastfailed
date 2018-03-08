@@ -1,0 +1,6 @@
+{
+  "test_bitbucket_api.py::test_projects_add_user": true, 
+  "test_bitbucket_api.py::test_projects_create_project": true, 
+  "test_bitbucket_api.py::test_projects_get_all_projects": true, 
+  "test_bitbucket_api.py::test_projects_get_users": true
+}
